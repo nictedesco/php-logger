@@ -29,11 +29,6 @@ class Logger
   private static $logFile = null;
 
   /**
-   * Actual Date and time.
-   */
-  private static $date = null;
-
-  /**
    * Log level.
    */
   private static $logLevel = null;
@@ -49,16 +44,6 @@ class Logger
   public function setLogFile($logFile)
   {
   	self::$logFile = $logFile;
-  }
-
-  public static function getDate()
-  {
-    return self::$date;
-  }
-
-  private static function setDate()
-  {
-    self::$date = date_create(null, timezone_open('UTC'));
   }
 
   public static function getLogLevel()
@@ -105,10 +90,6 @@ class Logger
    */
   private static function buildLogMessage($level, $message)
   {
-  	if (null !== self::getDate()) {
-  		self::setDate();
-  	}
-
     return self::getFormattedDate() . " - {$level} - {$message}";
   }
 
