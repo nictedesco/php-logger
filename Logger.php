@@ -53,6 +53,21 @@ class Logger
 
   public static function setLogLevel($logLevel)
   {
+    switch ($logLevel) {
+      case LogLevel::strInfo:
+        $logLevel = LogLevel::INFO;
+        break;
+      case LogLevel::strWarn:
+        $logLevel = LogLevel::WARN;
+        break;
+      case LogLevel::strError:
+        $logLevel = LogLevel::ERROR;
+        break;
+      case LogLevel::strDebug:
+        $logLevel = LogLevel::DEBUG;
+        break;
+    }
+
     self::$logLevel = $logLevel;
   }
 
