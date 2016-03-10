@@ -86,11 +86,11 @@ class Logger
    * Get UTC timezone formatted date.
    *
    * @return string date
-   *    Formatted date (Year.Month.Day Hour:Minute:Second Diff to GMT)
+   *    Formatted date (Year.Month.Day Hour:Minute:Second TimeZone)
    */
   public static function getFormattedDate()
   {
-  	return date_format(date_create(null, timezone_open('UTC')), 'Y.m.d H:i:s P');
+  	return date_format(date_create(null, timezone_open('UTC')), 'Y.m.d H:i:s e');
   }
 
   /**
@@ -106,7 +106,7 @@ class Logger
    */
   private static function buildLogMessage($level, $message)
   {
-    return self::getFormattedDate() . " - {$level} - {$message}";
+    return self::getFormattedDate() . " - [{$level}] - {$message}";
   }
 
   /**
