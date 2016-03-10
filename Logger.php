@@ -55,20 +55,21 @@ class Logger
   {
     switch ($logLevel) {
       case LogLevel::strInfo:
-        $logLevel = LogLevel::INFO;
+        self::$logLevel = LogLevel::INFO;
         break;
       case LogLevel::strWarn:
-        $logLevel = LogLevel::WARN;
+        self::$logLevel = LogLevel::WARN;
         break;
       case LogLevel::strError:
-        $logLevel = LogLevel::ERROR;
+        self::$logLevel = LogLevel::ERROR;
         break;
       case LogLevel::strDebug:
-        $logLevel = LogLevel::DEBUG;
+        self::$logLevel = LogLevel::DEBUG;
+        break;
+      default:
+        self::$logLevel = $logLevel;
         break;
     }
-
-    self::$logLevel = $logLevel;
   }
 
   /**
