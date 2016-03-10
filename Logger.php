@@ -41,7 +41,7 @@ class Logger
   	return self::$logFile;
   }
 
-  public function setLogFile($logFile)
+  public static function setLogFile($logFile)
   {
   	self::$logFile = $logFile;
   }
@@ -82,7 +82,7 @@ class Logger
   private function __destruct() {}
 
   /**
-   * Get UTC formatted date.
+   * Get UTC timezone formatted date.
    *
    * @return string date
    *    Formatted date (Year.Month.Day Hour:Minute:Second Diff to GMT)
