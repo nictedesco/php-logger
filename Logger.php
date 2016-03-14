@@ -34,6 +34,11 @@ class Logger
   private static $logLevel = null;
 
   /**
+   * Log buffer, used if log file is not set or attempt to write log fails.
+   */
+  private static $logBuffer = array();
+
+  /**
    * Getters and setters.
    */
   public static function getLogFile()
@@ -70,6 +75,16 @@ class Logger
         self::$logLevel = $logLevel;
         break;
     }
+  }
+
+  private static function getLogBuffer()
+  {
+    return self::$logBuffer;
+  }
+
+  private static function addMessageToBuffer($message)
+  {
+     return array_push(self::$logBuffer, $message);
   }
 
   /**
@@ -186,9 +201,37 @@ class Logger
    */
   private static function log($level, $message)
   {
-  	$logger = fopen(self::getLogFile(), 'a');
-  	$result = (bool)fwrite($logger, self::buildLogMessage($level, $message) . PHP_EOL);
-  	fclose($logger);
+    self::checkFilePermissions();
+
+    if (self::getLogFile() == null || self::getLogFile() == '') {
+      self::addMessageToBuffer(self::buildLogMessage($level, $message));
+      return false;
+    }
+
+    try {
+      $logger = fopen(self::getLogFile(), 'a');
+
+      foreach (self::$logBuffer as $key => $value) {
+        $result = (bool)fwrite($logger, $value . PHP_EOL);
+      }
+
+      $result = (bool)fwrite($logger, self::buildLogMessage($level, $message) . PHP_EOL);
+    } catch (Exception $e) {
+      $result = false;
+      self::addMessageToBuffer(self::buildLogMessage($level, $message));
+    } finally {
+      fclose($logger);
+    }
   	return $result;
+  }
+
+  /**
+   * Check file permissions and try to set read and write permissions if not set
+   */
+  private static function checkFilePermissions()
+  {
+    if (!is_readable(self::getLogFile()) && file_exists(self::getLogFile())) {
+      chmod(self::getLogFile(), 0600);
+    }
   }
 }
