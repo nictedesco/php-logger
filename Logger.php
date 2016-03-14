@@ -125,6 +125,26 @@ class Logger
   }
 
   /**
+   * Log message with custom level
+   *
+   * @param float $level
+   *    Log level, float to be compared with level set before (-1: never log, 4: always log)
+   * @param string $strLevel
+   *    String lg level, it will appear in log file
+   * @param string $message
+   *    Message to log
+   *
+   * @return bool result
+   *    Log result, true if log was successfully written
+   */
+  public static function custom($level, $strLevel, $message)
+  {
+    if (self::getLogLevel() >= $level) {
+      return self::log($strLevel, $message);
+    }
+  }
+
+  /**
    * Log message with info level.
    *
    * @param string $message
@@ -189,7 +209,7 @@ class Logger
   }
 
   /**
-   * Write log message in log file.
+   * Try to write log message in log file.
    *
    * @param logLevel $level
    *    Log level
@@ -201,13 +221,21 @@ class Logger
    */
   private static function log($level, $message)
   {
-    self::checkFilePermissions();
-
+    // If log file is not set add log message to buffer and return
     if (self::getLogFile() == null || self::getLogFile() == '') {
       self::addMessageToBuffer(self::buildLogMessage($level, $message));
       return false;
     }
 
+    // Check file permissions and if cannot write try to make it writable, if not
+    // succeed add message to buffer and return
+    if (!self::checkFilePermissions())
+    {
+      self::addMessageToBuffer(self::buildLogMessage($level, $message));
+      return false;
+    }
+
+    // Try to write log message(s) on file
     try {
       $logger = fopen(self::getLogFile(), 'a');
 
@@ -218,7 +246,7 @@ class Logger
       $result = (bool)fwrite($logger, self::buildLogMessage($level, $message) . PHP_EOL);
     } catch (Exception $e) {
       $result = false;
-      self::addMessageToBuffer(self::buildLogMessage($level, $message));
+      self::addMessageToBuffer(self::buildLogMessage($level, "Failed to log message: {$e}"));
     } finally {
       fclose($logger);
     }
@@ -230,8 +258,9 @@ class Logger
    */
   private static function checkFilePermissions()
   {
-    if (!is_readable(self::getLogFile()) && file_exists(self::getLogFile())) {
-      chmod(self::getLogFile(), 0600);
+    if (!is_writable(self::getLogFile()) && file_exists(self::getLogFile())) {
+      return chmod(self::getLogFile(), 0200);
     }
+    return true;
   }
 }
